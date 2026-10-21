@@ -11,8 +11,34 @@ Ambiance : nocturne, poétique et cozy. Pas de mort, pas de monstre, seulement d
 
 ## État du projet
 
-📐 **Phase de conception.** La documentation est écrite, le code n'a pas encore commencé.
-Prochaine étape : **Jalon 0** de la [feuille de route](docs/04-roadmap-mvp.md).
+🏗️ **Jalon 0 terminé** : le squelette du projet tourne.
+Prochaine étape : **Jalon 1 · La salle à deux** de la [feuille de route](docs/04-roadmap-mvp.md).
+
+## Lancer le projet
+
+Prérequis : [Node.js 24 LTS](https://nodejs.org).
+
+```bash
+npm install     # une seule fois (ou après un git pull qui ajoute des dépendances)
+npm run dev     # lance le serveur de jeu + le client
+```
+
+Ouvre ensuite http://localhost:5173. La page doit afficher « Serveur : connecté ✔ ».
+Pour arrêter, tape `Ctrl + C` dans le terminal.
+
+| Commande | Effet |
+|---|---|
+| `npm run dev` | serveur (port 2567) + client Vite (port 5173), rechargement automatique |
+| `npm run typecheck` | vérifie les types TypeScript de tous les paquets |
+
+## Organisation du code
+
+```
+packages/
+├─ shared/   code commun client + serveur (constantes, plus tard : génération, physique)
+├─ server/   serveur de jeu Node (deviendra Colyseus au jalon 1)
+└─ client/   le jeu dans le navigateur (Vite, puis Three.js)
+```
 
 ## Documentation
 

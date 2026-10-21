@@ -1,0 +1,16 @@
+{
+  "name": "phare-et-constel",
+  "private": true,
+  "description": "Jeu coopératif à 2 joueurs : un Capitaine dans la brume, un Gardien de phare, une radio.",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n serveur,client -c yellow,cyan \"npm run dev -w @phare/server\" \"npm run dev -w @phare/client\"",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "typescript": "^7.0.2"
+  }
+}

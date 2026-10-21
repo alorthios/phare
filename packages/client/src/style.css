@@ -1,0 +1,39 @@
+:root {
+  --nuit: #0b1630;
+  --nuit-claire: #1a2a50;
+  --or: #ffd98a;
+  --brume: #9fb0d0;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: radial-gradient(ellipse at top, var(--nuit-claire), var(--nuit) 70%);
+  color: var(--brume);
+  font-family: Georgia, "Times New Roman", serif;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+#app { text-align: center; }
+
+h1 {
+  color: var(--or);
+  font-size: clamp(2rem, 7vw, 4rem);
+  font-weight: normal;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.5rem;
+  text-shadow: 0 0 24px rgba(255, 217, 138, 0.35);
+}
+
+.subtitle { font-style: italic; margin: 0 0 2rem; }
+
+.status { font-family: system-ui, sans-serif; font-size: 0.9rem; opacity: 0.8; }
+.status.ok { color: #9be3a5; }
+.status.ko { color: #f3a0a0; }

@@ -1,0 +1,16 @@
+{
+  "name": "@phare/server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15"
+  },
+  "dependencies": {
+    "@phare/shared": "*"
+  }
+}

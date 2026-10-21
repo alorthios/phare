@@ -10,11 +10,11 @@
 
 ## Jalon 0 · Fondations
 
-- ☐ Installer Node.js 22 LTS et VS Code (voir [guide débutant](00-guide-debutant.md))
-- ☐ Créer le monorepo : `packages/shared`, `packages/server`, `packages/client` (npm workspaces + TypeScript)
-- ☐ Client Vite qui affiche « Phare & Constel » sur fond bleu nuit
-- ☐ Serveur Node qui écrit « serveur prêt » dans le terminal
-- ☐ Un seul `npm run dev` lance les deux
+- ✅ Installer Node.js 24 LTS (VS Code : à installer de ton côté, voir [guide débutant](00-guide-debutant.md))
+- ✅ Créer le monorepo : `packages/shared`, `packages/server`, `packages/client` (npm workspaces + TypeScript)
+- ✅ Client Vite qui affiche « Phare & Constel » sur fond bleu nuit
+- ✅ Serveur Node qui écrit « serveur prêt » dans le terminal (et répond sur `/api/health`)
+- ✅ Un seul `npm run dev` lance les deux
 
 **C'est fini quand :** `npm run dev`, puis ouvrir http://localhost:5173, affiche la page.
 

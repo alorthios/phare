@@ -6,7 +6,7 @@ Ce guide couvre tout ce qu'il faut installer et comprendre avant d'écrire la pr
 
 | Outil | Pourquoi | Où |
 |---|---|---|
-| **Node.js 22 LTS** | Exécute le serveur et les outils du client (Vite) | https://nodejs.org (bouton « LTS ») |
+| **Node.js 24 LTS** | Exécute le serveur et les outils du client (Vite) | https://nodejs.org (bouton « LTS ») |
 | **Git** | Historique du code, envoi sur GitHub | déjà installé ✅ |
 | **VS Code** | Éditeur de code | https://code.visualstudio.com |
 | **Docker Desktop** | Lancer toute la partie en une commande (plus tard) | déjà installé ✅ |
@@ -17,7 +17,7 @@ Extensions VS Code conseillées : *ESLint*, *Prettier*, *Shader languages suppor
 Pour vérifier l'installation, ouvre un terminal :
 
 ```bash
-node -v    # doit afficher v22.x
+node -v    # doit afficher v24.x
 npm -v
 git --version
 ```
