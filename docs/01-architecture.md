@@ -154,6 +154,22 @@ Les clients **interpolent** entre deux états reçus (affichage à 60 images/s),
 
 ## Docker
 
-- **En développement :** pas de Docker. On lance `npm run dev`, qui démarre le serveur et Vite en même temps, avec rechargement automatique.
-- **Pour une soirée de jeu en réseau local :** `docker compose up`, qui lance un conteneur `server` servant aussi les fichiers du client déjà compilés, en HTTPS.
+**Le projet tourne dans Docker**, aussi bien en développement que pour jouer.
+
+```
+compose.yaml
+├─ server   node:24-alpine → npm run dev -w @phare/server   (port 2567)
+└─ client   node:24-alpine → npm run dev -w @phare/client   (port 5173, ouvert au réseau local)
+            proxy /api (puis le WebSocket) → http://server:2567
+```
+
+- **Une seule image** (`Dockerfile`) pour les deux services. Seule la commande de lancement change.
+- **Les `node_modules` sont installés dans l'image**, pour Linux. Ceux de Windows sont exclus par `.dockerignore`, car certains paquets (esbuild, rolldown) contiennent des programmes compilés pour un système précis.
+- **Rechargement automatique avec Compose Watch** (`docker compose up --watch`). Un dossier Windows simplement monté dans un conteneur ne prévient pas Linux qu'un fichier a changé. Compose Watch **recopie** donc chaque fichier modifié dans `packages/` vers le conteneur, puis Vite ou tsx rechargent. Si `package-lock.json` change, parce qu'on a ajouté une dépendance, l'image est reconstruite.
+- **Dans Docker, les services se parlent par leur nom :** le client joint le serveur à l'adresse `http://server:2567` (variable `SERVER_URL`).
+
+Étapes prévues :
+- **Soirée de jeu en réseau local (jalon 7) :** un service `game` « production » qui sert le client compilé et le serveur, en HTTPS.
 - **Plus tard, en ligne :** ajout d'un conteneur `coturn` et d'un vrai certificat.
+
+> Node.js installé sur Windows n'est **pas obligatoire** pour lancer le jeu. Il reste utile pour VS Code : un `npm install` local donne l'autocomplétion et la vérification des types dans l'éditeur.

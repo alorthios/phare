@@ -15,8 +15,9 @@
 - ✅ Client Vite qui affiche « Phare & Constel » sur fond bleu nuit
 - ✅ Serveur Node qui écrit « serveur prêt » dans le terminal (et répond sur `/api/health`)
 - ✅ Un seul `npm run dev` lance les deux
+- ✅ Tout tourne dans Docker : `docker compose up --build --watch`, avec rechargement automatique
 
-**C'est fini quand :** `npm run dev`, puis ouvrir http://localhost:5173, affiche la page.
+**C'est fini quand :** `docker compose up --build --watch`, puis ouvrir http://localhost:5173, affiche « Serveur : connecté ✔ ».
 
 ## Jalon 1 · La salle à deux
 
@@ -88,7 +89,7 @@
 - ☐ Arrivée au Port, puis écran de fin (durée de la nuit, nombre de messages radio)
 - ☐ Bouton « Nuit suivante », qui lance un nouveau seed avec les mêmes joueurs
 - ☐ Reconnexion si un joueur recharge la page
-- ☐ `Dockerfile` + `docker-compose.yml` : une commande pour héberger une soirée en réseau local
+- ☐ Service Docker « production » (client compilé + serveur, HTTPS) : une commande pour héberger une soirée en réseau local
 - ☐ Session de test avec quelqu'un qui ne connaît pas le jeu, en notant ce qui bloque
 
 **C'est fini quand :** une personne extérieure termine une nuit et a envie d'en refaire une.

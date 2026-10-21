@@ -1,0 +1,35 @@
+# Lancer le projet :   docker compose up --build --watch
+# Arrêter :            Ctrl + C   (puis "docker compose down" pour tout nettoyer)
+name: phare
+
+# Compose Watch : à chaque sauvegarde d'un fichier dans packages/, Docker le recopie
+# dans le conteneur, ce qui déclenche le rechargement automatique (Vite / tsx).
+x-watch: &watch
+  watch:
+    - action: sync
+      path: ./packages
+      target: /app/packages
+      ignore:
+        - "**/node_modules/"
+    - action: rebuild          # nouvelle dépendance → on reconstruit l'image
+      path: ./package-lock.json
+
+services:
+  server:
+    build: .
+    command: npm run dev -w @phare/server
+    ports:
+      - "2567:2567"
+    develop: *watch
+
+  client:
+    build: .
+    command: npm run dev -w @phare/client
+    environment:
+      # Dans Docker, le client joint le serveur par son nom de service.
+      SERVER_URL: http://server:2567
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    develop: *watch

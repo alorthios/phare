@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "docker": "docker compose up --build --watch",
     "dev": "concurrently -n serveur,client -c yellow,cyan \"npm run dev -w @phare/server\" \"npm run dev -w @phare/client\"",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

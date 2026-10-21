@@ -9,7 +9,7 @@ Ce guide couvre tout ce qu'il faut installer et comprendre avant d'écrire la pr
 | **Node.js 24 LTS** | Exécute le serveur et les outils du client (Vite) | https://nodejs.org (bouton « LTS ») |
 | **Git** | Historique du code, envoi sur GitHub | déjà installé ✅ |
 | **VS Code** | Éditeur de code | https://code.visualstudio.com |
-| **Docker Desktop** | Lancer toute la partie en une commande (plus tard) | déjà installé ✅ |
+| **Docker Desktop** | **Fait tourner le jeu** (serveur + client) dans des conteneurs | déjà installé ✅ |
 | **Chrome ou Edge** | Navigateur de test (bons outils de debug WebRTC/audio) | — |
 
 Extensions VS Code conseillées : *ESLint*, *Prettier*, *Shader languages support* (coloration GLSL).

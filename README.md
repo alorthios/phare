@@ -16,20 +16,23 @@ Prochaine étape : **Jalon 1 · La salle à deux** de la [feuille de route](docs
 
 ## Lancer le projet
 
-Prérequis : [Node.js 24 LTS](https://nodejs.org).
+Prérequis : [Docker Desktop](https://www.docker.com/products/docker-desktop/) **démarré**.
 
 ```bash
-npm install     # une seule fois (ou après un git pull qui ajoute des dépendances)
-npm run dev     # lance le serveur de jeu + le client
+docker compose up --build --watch
 ```
 
 Ouvre ensuite http://localhost:5173. La page doit afficher « Serveur : connecté ✔ ».
-Pour arrêter, tape `Ctrl + C` dans le terminal.
+Quand tu sauvegardes un fichier dans `packages/`, il est recopié dans le conteneur et l'application se recharge toute seule.
+Pour arrêter, tape `Ctrl + C`, puis `docker compose down`.
 
 | Commande | Effet |
 |---|---|
-| `npm run dev` | serveur (port 2567) + client Vite (port 5173), rechargement automatique |
-| `npm run typecheck` | vérifie les types TypeScript de tous les paquets |
+| `docker compose up --build --watch` | lance serveur (port 2567) et client (port 5173) dans Docker, avec rechargement automatique |
+| `docker compose down` | arrête et supprime les conteneurs |
+| `docker compose logs -f server` | affiche les messages du serveur |
+
+Sans Docker, si Node.js 24 est installé : `npm install` puis `npm run dev`. `npm run typecheck` vérifie les types TypeScript.
 
 ## Organisation du code
 
