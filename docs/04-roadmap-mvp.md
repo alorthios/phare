@@ -17,22 +17,22 @@
 - ✅ Un seul `npm run dev` lance les deux
 - ✅ Tout tourne dans Docker : `docker compose up --build --watch`, avec rechargement automatique
 
-**C'est fini quand :** `docker compose up --build --watch`, puis ouvrir http://localhost:5173, affiche « Serveur : connecté ✔ ».
+**C'est fini quand :** `docker compose up --build --watch`, puis ouvrir https://localhost:5173, affiche « Serveur : connecté ✔ ».
 
 ## Jalon 1 · La salle à deux
 
-- ☐ Serveur Colyseus avec une `GameRoom` limitée à 2 joueurs
-- ☐ Écran d'accueil : « Créer une partie » (génère un code à 4 lettres) / « Rejoindre » (saisie du code)
-- ☐ Choix du rôle : Capitaine ou Gardien (un seul de chaque)
-- ☐ Afficher « Ton coéquipier est connecté ✔ »
-- ☐ Activer le HTTPS local (`@vitejs/plugin-basic-ssl`) et le proxy WebSocket dans Vite
+- ✅ Serveur Colyseus 0.18 avec une salle `NightRoom` limitée à 2 joueurs (`packages/server/src/rooms/NightRoom.ts`)
+- ✅ Écran d'accueil : « Créer une partie » (génère un code à 4 lettres, qui sert d'identifiant de salle) / « Rejoindre » (saisie du code)
+- ✅ Choix du rôle : Capitaine ou Gardien (un seul de chaque, vérifié par le serveur)
+- ✅ Afficher « Ton coéquipier est connecté ✔ »
+- ✅ HTTPS local (`@vitejs/plugin-basic-ssl`) et proxy `/colyseus` (WebSocket compris) dans Vite
 
 **C'est fini quand :** deux onglets, ou deux PC du réseau local, se retrouvent dans la même salle avec des rôles différents.
 
 ## Jalon 2 · La radio ⭐ (cœur du jeu)
 
 - ☐ Capture du micro (`getUserMedia`) avec l'écran « Autoriser le micro »
-- ☐ Connexion WebRTC entre les deux joueurs (messages de *signaling* relayés par la `GameRoom`)
+- ☐ Connexion WebRTC entre les deux joueurs (messages de *signaling* relayés par la `NightRoom`)
 - ☐ Push-to-Talk sur **[Espace]** : `ptt_request` → le serveur accorde → piste activée
 - ☐ Semi-duplex : si l'autre parle, mon appui donne un « bip occupé »
 - ☐ Chaîne DSP sur la voix reçue (lowpass, bruit, crépitements)

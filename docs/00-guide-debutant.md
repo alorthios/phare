@@ -60,11 +60,12 @@ Bonnes habitudes :
 
 Les navigateurs **n'autorisent le micro que sur une page sécurisée** : `https://…` ou `http://localhost`.
 
-- Sur **ton** PC, `http://localhost:5173` fonctionne.
-- Sur le **second** PC, `http://192.168.1.42:5173` **ne donnera pas accès au micro**.
+Sur le **second** PC, une adresse `http://192.168.1.42:5173` **ne donnerait pas accès au micro**.
 
-Solution prévue : servir le jeu en **HTTPS avec un certificat auto-signé** (plugin `@vitejs/plugin-basic-ssl` de Vite).
-Au premier accès, le navigateur affiche « Votre connexion n'est pas privée ». On clique sur *Paramètres avancés*, puis *Continuer*. C'est normal sur un réseau local.
+Solution en place : le jeu est servi en **HTTPS avec un certificat auto-signé** (plugin `@vitejs/plugin-basic-ssl` de Vite). L'adresse est donc toujours **`https://…:5173`**, aussi bien sur `localhost` que depuis le second PC.
+Au premier accès, le navigateur affiche « Votre connexion n'est pas privée ». On clique sur *Paramètres avancés*, puis *Continuer vers le site*. C'est normal : le certificat n'est pas signé par une autorité, mais la connexion reste chiffrée sur ton réseau local.
+
+> Le certificat est recréé quand le conteneur `client` est reconstruit. Il faudra alors accepter l'avertissement une nouvelle fois.
 
 Pour trouver l'adresse IP de ton PC (Windows) :
 
@@ -72,7 +73,11 @@ Pour trouver l'adresse IP de ton PC (Windows) :
 ipconfig   # cherche "Adresse IPv4" de ta carte Wi-Fi/Ethernet, ex: 192.168.1.42
 ```
 
-Le pare-feu Windows demandera peut-être d'autoriser Node.js sur le réseau **privé** : accepte.
+Le second PC ouvre alors `https://192.168.1.42:5173`.
+
+Si la page ne charge pas depuis le second PC :
+- vérifie que le profil réseau Windows de ton PC est **Privé**, et non Public (*Paramètres → Réseau et Internet → Wi-Fi → ton réseau*) ;
+- le pare-feu Windows peut demander d'autoriser Docker Desktop (*com.docker.backend*) : accepte pour les réseaux privés.
 
 ## 5. Comment tester seul à deux joueurs
 

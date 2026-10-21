@@ -1,31 +1,42 @@
 :root {
   --nuit: #0b1630;
   --nuit-claire: #1a2a50;
+  --carte: rgba(20, 34, 66, 0.75);
+  --bord: rgba(159, 176, 208, 0.25);
   --or: #ffd98a;
+  --or-sombre: #c9a65a;
   --brume: #9fb0d0;
+  --texte: #dde5f5;
+  --ok: #9be3a5;
+  --ko: #f3a0a0;
 }
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
-  background: radial-gradient(ellipse at top, var(--nuit-claire), var(--nuit) 70%);
+  background: radial-gradient(ellipse at top, var(--nuit-claire), var(--nuit) 70%) fixed;
   color: var(--brume);
   font-family: Georgia, "Times New Roman", serif;
   display: grid;
   place-items: center;
+  min-height: 100vh;
   padding: 16px;
 }
 
-#app { text-align: center; }
+#app {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+}
 
 h1 {
   color: var(--or);
-  font-size: clamp(2rem, 7vw, 4rem);
+  font-size: clamp(2rem, 7vw, 3.5rem);
   font-weight: normal;
   letter-spacing: 0.05em;
   margin: 0 0 0.5rem;
@@ -34,6 +45,102 @@ h1 {
 
 .subtitle { font-style: italic; margin: 0 0 2rem; }
 
-.status { font-family: system-ui, sans-serif; font-size: 0.9rem; opacity: 0.8; }
-.status.ok { color: #9be3a5; }
-.status.ko { color: #f3a0a0; }
+/* --- Carte (panneau central) --- */
+.card {
+  background: var(--carte);
+  border: 1px solid var(--bord);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: left;
+  backdrop-filter: blur(4px);
+}
+
+label { display: block; font-size: 0.9rem; margin-bottom: 6px; }
+
+input {
+  width: 100%;
+  font: inherit;
+  color: var(--texte);
+  background: rgba(11, 22, 48, 0.8);
+  border: 1px solid var(--bord);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+input:focus { outline: 2px solid var(--or-sombre); outline-offset: 1px; }
+
+.code-input {
+  font-family: ui-monospace, Consolas, monospace;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  color: var(--texte);
+  background: transparent;
+  border: 1px solid var(--bord);
+  border-radius: 8px;
+  padding: 10px 16px;
+}
+button:hover:not(:disabled) { border-color: var(--or-sombre); }
+button:disabled { cursor: not-allowed; opacity: 0.5; }
+button.primary { background: var(--or); color: var(--nuit); border-color: var(--or); width: 100%; }
+button.link { border: none; padding: 6px 0; color: var(--brume); text-decoration: underline; }
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+.choice p { margin: 0 0 8px; font-size: 0.9rem; }
+.row { display: flex; gap: 8px; }
+.row input { min-width: 0; }
+
+@media (max-width: 480px) {
+  .choices { grid-template-columns: 1fr; }
+}
+
+.error { color: var(--ko); min-height: 1.2em; margin: 16px 0 0; font-size: 0.9rem; }
+
+/* --- Salle d'attente --- */
+.code-label { margin: 0; text-align: center; font-size: 0.9rem; }
+.code {
+  margin: 4px 0;
+  text-align: center;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 2.6rem;
+  letter-spacing: 0.35em;
+  color: var(--or);
+}
+.hint { text-align: center; font-size: 0.85rem; margin: 0 0 20px; word-break: break-all; }
+
+.roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 480px) {
+  .roles { grid-template-columns: 1fr; }
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  padding: 14px;
+}
+.role-card strong { color: var(--or); font-weight: normal; font-size: 1.1rem; }
+.role-desc { font-size: 0.85rem; color: var(--brume); }
+.role-holder { font-size: 0.85rem; margin-top: auto; }
+.role-card.mine { border-color: var(--or); box-shadow: 0 0 16px rgba(255, 217, 138, 0.25); }
+
+.lobby-status { text-align: center; margin: 20px 0 8px; color: var(--texte); }
+
+/* --- Statut serveur --- */
+.status { font-family: system-ui, sans-serif; font-size: 0.8rem; opacity: 0.8; margin-top: 16px; }
+.status.ok { color: var(--ok); }
+.status.ko { color: var(--ko); }

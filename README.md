@@ -11,8 +11,8 @@ Ambiance : nocturne, poétique et cozy. Pas de mort, pas de monstre, seulement d
 
 ## État du projet
 
-🏗️ **Jalon 0 terminé** : le squelette du projet tourne.
-Prochaine étape : **Jalon 1 · La salle à deux** de la [feuille de route](docs/04-roadmap-mvp.md).
+🏗️ **Jalon 1 terminé** : deux joueurs se retrouvent dans une salle avec un code et choisissent leurs rôles.
+Prochaine étape : **Jalon 2 · La radio** de la [feuille de route](docs/04-roadmap-mvp.md).
 
 ## Lancer le projet
 
@@ -22,7 +22,8 @@ Prérequis : [Docker Desktop](https://www.docker.com/products/docker-desktop/) *
 docker compose up --build --watch
 ```
 
-Ouvre ensuite http://localhost:5173. La page doit afficher « Serveur : connecté ✔ ».
+Ouvre ensuite **https://localhost:5173**. Le navigateur affiche un avertissement de sécurité, car le certificat est auto-signé : clique sur *Paramètres avancés*, puis *Continuer*.
+La page doit afficher « Serveur : connecté ✔ ». Depuis un autre PC du réseau local : `https://<IP de ton PC>:5173` (voir le [guide](docs/00-guide-debutant.md#4-jouer-en-réseau-local--le-piège-du-micro)).
 Quand tu sauvegardes un fichier dans `packages/`, il est recopié dans le conteneur et l'application se recharge toute seule.
 Pour arrêter, tape `Ctrl + C`, puis `docker compose down`.
 
@@ -38,9 +39,9 @@ Sans Docker, si Node.js 24 est installé : `npm install` puis `npm run dev`. `np
 
 ```
 packages/
-├─ shared/   code commun client + serveur (constantes, plus tard : génération, physique)
-├─ server/   serveur de jeu Node (deviendra Colyseus au jalon 1)
-└─ client/   le jeu dans le navigateur (Vite, puis Three.js)
+├─ shared/   code commun client + serveur : rôles, état synchronisé (schema), constantes
+├─ server/   serveur de jeu Colyseus : rooms/NightRoom.ts = une partie à 2
+└─ client/   le jeu dans le navigateur (Vite) : net/ = connexion, ui/ = écrans
 ```
 
 ## Documentation

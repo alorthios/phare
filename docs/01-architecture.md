@@ -22,7 +22,7 @@
         │ WebSocket (Colyseus)  │◄──── audio WebRTC P2P ────►│                       │
         ▼                       └────────────────────────────┘                       ▼
 ┌──────────────────────────────── SERVEUR (Node + Colyseus) ──────────────────────────────────────┐
-│ GameRoom (1 salle = 1 partie à 2)                                                               │
+│ NightRoom (1 salle = 1 partie à 2)                                                               │
 │  • tire le seed de la nuit, génère le niveau (même code que le client)                           │
 │  • simule le bateau (20 fois/s) et gère les collisions avec les côtes                            │
 │  • arbitre la radio : qui a la parole (floorHolder)                                              │
@@ -45,7 +45,7 @@ phare/
 │  │  ├─ beam.ts           # test « point dans le faisceau ? »
 │  │  └─ messages.ts       # types des messages réseau
 │  ├─ server/        # Node + Colyseus
-│  │  └─ rooms/GameRoom.ts
+│  │  └─ rooms/NightRoom.ts
 │  └─ client/        # Vite + Three.js
 │     ├─ net/              # connexion Colyseus, WebRTC
 │     ├─ radio/            # PTT, chaîne DSP

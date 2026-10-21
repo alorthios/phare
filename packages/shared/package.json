@@ -7,5 +7,8 @@
   },
   "scripts": {
     "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@colyseus/schema": "^5.0.42"
   }
 }

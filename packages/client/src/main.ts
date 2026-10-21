@@ -1,7 +1,20 @@
 import "./style.css";
 import { GAME_TITLE } from "@phare/shared";
+import type { NightRoom } from "./net/connection.ts";
+import { showHome } from "./ui/home.ts";
+import { showLobby } from "./ui/lobby.ts";
 
 document.querySelector("#title")!.textContent = GAME_TITLE;
+
+function goHome(message = "") {
+  showHome(onJoined, message);
+}
+
+function onJoined(room: NightRoom) {
+  showLobby(room, () => goHome("Tu as quitté la partie."));
+}
+
+goHome();
 
 // Petit test : le client arrive-t-il à joindre le serveur ?
 const status = document.querySelector<HTMLParagraphElement>("#server-status")!;
@@ -13,7 +26,7 @@ async function checkServer() {
     status.textContent = "Serveur : connecté ✔";
     status.className = "status ok";
   } catch {
-    status.textContent = "Serveur : injoignable ✘ (as-tu lancé npm run dev ?)";
+    status.textContent = "Serveur : injoignable ✘";
     status.className = "status ko";
   }
 }

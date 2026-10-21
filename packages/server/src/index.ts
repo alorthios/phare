@@ -1,18 +1,20 @@
-import { createServer } from "node:http";
-import { GAME_TITLE, SERVER_PORT } from "@phare/shared";
+import { Server } from "@colyseus/core";
+import { WebSocketTransport } from "@colyseus/ws-transport";
+import { GAME_TITLE, ROOM_NAME, SERVER_PORT } from "@phare/shared";
+import { NightRoom } from "./rooms/NightRoom.ts";
 
-// Jalon 0 : un simple serveur HTTP qui répond "ok" sur /api/health.
-// Au jalon 1, il sera remplacé par Colyseus (salles multijoueur).
-const server = createServer((req, res) => {
-  if (req.url === "/api/health") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ ok: true, game: GAME_TITLE }));
-    return;
-  }
-  res.writeHead(404);
-  res.end();
+const server = new Server({
+  transport: new WebSocketTransport(),
+  greet: false,
+  express: (app) => {
+    // Petit point de contrôle utilisé par la page d'accueil.
+    app.get("/api/health", (_req, res) => {
+      res.json({ ok: true, game: GAME_TITLE });
+    });
+  },
 });
 
-server.listen(SERVER_PORT, () => {
-  console.log(`⚓ Serveur ${GAME_TITLE} prêt sur http://localhost:${SERVER_PORT}`);
-});
+server.define(ROOM_NAME, NightRoom);
+
+await server.listen(SERVER_PORT);
+console.log(`⚓ Serveur ${GAME_TITLE} prêt sur le port ${SERVER_PORT}`);
