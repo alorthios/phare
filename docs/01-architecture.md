@@ -158,7 +158,7 @@ Les clients **interpolent** entre deux états reçus (affichage à 60 images/s),
 
 ```
 compose.yaml
-├─ server   node:24-alpine → npm run dev -w @phare/server   (port 2567)
+├─ server   node:24-alpine → npm run dev -w @phare/server   (port 2567, interne à Docker)
 └─ client   node:24-alpine → npm run dev -w @phare/client   (port 5173, ouvert au réseau local)
             proxy /api (puis le WebSocket) → http://server:2567
 ```

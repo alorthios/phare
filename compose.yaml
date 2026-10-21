@@ -18,8 +18,7 @@ services:
   server:
     build: .
     command: npm run dev -w @phare/server
-    ports:
-      - "2567:2567"
+    # Pas de "ports" : le serveur n'est joint que par le client, via le réseau interne de Docker.
     develop: *watch
 
   client:

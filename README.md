@@ -29,7 +29,7 @@ Pour arrêter, tape `Ctrl + C`, puis `docker compose down`.
 
 | Commande | Effet |
 |---|---|
-| `docker compose up --build --watch` | lance serveur (port 2567) et client (port 5173) dans Docker, avec rechargement automatique |
+| `docker compose up --build --watch` | lance serveur et client (port 5173) dans Docker, avec rechargement automatique |
 | `docker compose down` | arrête et supprime les conteneurs |
 | `docker compose logs -f server` | affiche les messages du serveur |
 
