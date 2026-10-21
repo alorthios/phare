@@ -1,13 +1,37 @@
 import { MSG, ROLES, ROLE_INFO } from "@phare/shared";
 import type { NightRoom } from "../net/connection.ts";
+import { MicError, Radio } from "../radio/radio.ts";
 import { h, showScreen } from "./dom.ts";
 
-/** Salle d'attente : code de la partie, choix des rôles, présence du coéquipier. */
-export function showLobby(room: NightRoom, onLeave: () => void) {
-  const render = () => {
+/**
+ * Salle d'attente : code de la partie, choix des rôles, présence du coéquipier.
+ * Quand l'équipage est complet, chacun allume sa radio (ce qui demande l'accès au micro).
+ */
+export function showLobby(room: NightRoom, onRadioOn: (radio: Radio) => void) {
+  let radioError = "";
+  let starting = false;
+
+  const turnOnRadio = async () => {
+    starting = true;
+    radioError = "";
+    render();
+    try {
+      const radio = await Radio.start(room);
+      room.onStateChange.remove(render);
+      onRadioOn(radio);
+    } catch (err) {
+      console.error(err);
+      radioError = err instanceof MicError ? err.message : "Impossible d'allumer la radio.";
+      starting = false;
+      render();
+    }
+  };
+
+  function render() {
     const players = [...room.state.players.entries()];
     const me = room.state.players.get(room.sessionId);
     const mate = players.find(([id]) => id !== room.sessionId)?.[1];
+    const crewComplete = Boolean(me?.role && mate?.role);
 
     const roleCards = ROLES.map((role) => {
       const holder = players.find(([, p]) => p.role === role);
@@ -17,7 +41,7 @@ export function showLobby(room: NightRoom, onLeave: () => void) {
 
       return h("button", {
         class: `role-card${mine ? " mine" : ""}`,
-        disabled: takenByMate,
+        disabled: takenByMate || starting,
         "aria-pressed": mine ? "true" : "false",
         onclick: () => room.send(MSG.chooseRole, mine ? "" : role),
       },
@@ -30,8 +54,10 @@ export function showLobby(room: NightRoom, onLeave: () => void) {
 
     let status: string;
     if (!mate) status = "En attente d'un coéquipier…";
-    else if (!me?.role || !mate.role) status = `${mate.name} est connecté ✔ Choisissez vos rôles.`;
-    else status = "Équipage complet ! ⚓ (la radio arrive au jalon 2)";
+    else if (!crewComplete) status = `${mate.name} est connecté ✔ Choisissez vos rôles.`;
+    else status = mate.radioReady
+      ? `Équipage complet ! ⚓ ${mate.name} a déjà allumé sa radio.`
+      : "Équipage complet ! ⚓";
 
     showScreen(
       h("div", { class: "card" },
@@ -40,13 +66,16 @@ export function showLobby(room: NightRoom, onLeave: () => void) {
         h("p", { class: "hint" }, `Ton coéquipier ouvre ${location.origin} et saisit ce code.`),
         h("div", { class: "roles" }, ...roleCards),
         h("p", { class: "lobby-status" }, status),
+        crewComplete && h("button", {
+          class: "primary", disabled: starting, onclick: turnOnRadio,
+        }, starting ? "Autorise le micro…" : "📻 Allumer la radio"),
+        h("p", { class: "error", role: "alert" }, radioError),
         h("button", { class: "link", onclick: () => { room.leave(); } }, "Quitter la partie"),
       ),
     );
-  };
+  }
 
   // On redessine l'écran à chaque changement d'état reçu du serveur.
   room.onStateChange(render);
-  room.onLeave(() => onLeave());
   render();
 }

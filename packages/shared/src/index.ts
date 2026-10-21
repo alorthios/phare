@@ -3,6 +3,7 @@
 
 export * from "./roles.ts";
 export * from "./state.ts";
+export * from "./radio.ts";
 
 export const GAME_TITLE = "Phare & Constel";
 
@@ -12,9 +13,19 @@ export const SERVER_PORT = 2567;
 /** Nom du type de salle Colyseus (une salle = une partie à 2). */
 export const ROOM_NAME = "nuit";
 
-/** Noms des messages client → serveur. */
+/** Noms des messages échangés entre client et serveur. */
 export const MSG = {
+  // client → serveur
   chooseRole: "choose_role",
+  radioReady: "radio_ready",
+  pttRequest: "ptt_request",
+  pttRelease: "ptt_release",
+  debugSignal: "debug_signal",
+  // serveur → client
+  radioLink: "radio_link",
+  pttDenied: "ptt_denied",
+  // dans les deux sens (relayé par le serveur vers l'autre joueur)
+  rtc: "rtc",
 } as const;
 
 /** Codes de partie : 4 lettres, sans I ni O (trop proches de 1 et 0). */

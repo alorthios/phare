@@ -1,8 +1,10 @@
 import "./style.css";
 import { GAME_TITLE } from "@phare/shared";
 import type { NightRoom } from "./net/connection.ts";
+import type { Radio } from "./radio/radio.ts";
 import { showHome } from "./ui/home.ts";
 import { showLobby } from "./ui/lobby.ts";
+import { showRadioScreen } from "./ui/radioScreen.ts";
 
 document.querySelector("#title")!.textContent = GAME_TITLE;
 
@@ -11,7 +13,19 @@ function goHome(message = "") {
 }
 
 function onJoined(room: NightRoom) {
-  showLobby(room, () => goHome("Tu as quitté la partie."));
+  let radio: Radio | undefined;
+  let cleanupScreen: (() => void) | undefined;
+
+  room.onLeave(() => {
+    cleanupScreen?.();
+    radio?.dispose();
+    goHome("Tu as quitté la partie.");
+  });
+
+  showLobby(room, (r) => {
+    radio = r;
+    cleanupScreen = showRadioScreen(room, r);
+  });
 }
 
 goHome();

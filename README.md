@@ -11,8 +11,8 @@ Ambiance : nocturne, poétique et cozy. Pas de mort, pas de monstre, seulement d
 
 ## État du projet
 
-🏗️ **Jalon 1 terminé** : deux joueurs se retrouvent dans une salle avec un code et choisissent leurs rôles.
-Prochaine étape : **Jalon 2 · La radio** de la [feuille de route](docs/04-roadmap-mvp.md).
+📻 **Jalon 2 en test** : la radio Push-to-Talk fonctionne (code écrit). Il reste à la tester à deux et à régler les sons à l'oreille.
+Voir la [feuille de route](docs/04-roadmap-mvp.md).
 
 ## Lancer le projet
 
@@ -41,7 +41,8 @@ Sans Docker, si Node.js 24 est installé : `npm install` puis `npm run dev`. `np
 packages/
 ├─ shared/   code commun client + serveur : rôles, état synchronisé (schema), constantes
 ├─ server/   serveur de jeu Colyseus : rooms/NightRoom.ts = une partie à 2
-└─ client/   le jeu dans le navigateur (Vite) : net/ = connexion, ui/ = écrans
+└─ client/   le jeu dans le navigateur (Vite) : net/ = connexion, ui/ = écrans,
+             radio/ = micro, WebRTC, Push-to-Talk, effets sonores
 ```
 
 ## Documentation

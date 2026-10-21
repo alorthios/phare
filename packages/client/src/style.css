@@ -144,3 +144,68 @@ button.link { border: none; padding: 6px 0; color: var(--brume); text-decoration
 .status { font-family: system-ui, sans-serif; font-size: 0.8rem; opacity: 0.8; margin-top: 16px; }
 .status.ok { color: var(--ok); }
 .status.ko { color: var(--ko); }
+
+/* --- Poste radio --- */
+.radio .code-label { margin-bottom: 4px; }
+.radio .hint { margin-bottom: 12px; }
+
+.led-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--bord);
+  border-radius: 10px;
+  background: rgba(11, 22, 48, 0.8);
+  font-family: ui-monospace, Consolas, monospace;
+  letter-spacing: 0.08em;
+  color: var(--texte);
+}
+.led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #34415f;
+  flex-shrink: 0;
+}
+.led.tx { background: #ff7a59; box-shadow: 0 0 12px #ff7a59; }
+.led.rx { background: var(--ok); box-shadow: 0 0 12px var(--ok); }
+.led.wait { background: var(--or-sombre); }
+
+.link-status { text-align: center; font-size: 0.85rem; margin: 10px 0 16px; }
+.link-status.connected { color: var(--ok); }
+.link-status.lost { color: var(--ko); }
+
+button.ptt {
+  display: block;
+  width: 100%;
+  padding: 28px 16px;
+  font-size: 1.15rem;
+  border-radius: 14px;
+  border: 2px solid var(--or-sombre);
+  color: var(--or);
+  user-select: none;
+  touch-action: none;
+}
+button.ptt.active {
+  background: var(--or);
+  color: var(--nuit);
+  box-shadow: 0 0 28px rgba(255, 217, 138, 0.45);
+}
+.radio .ptt + .hint { text-align: center; margin-top: 8px; }
+
+.meter { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; margin: 8px 0 16px; }
+.meter-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(159, 176, 208, 0.15);
+  overflow: hidden;
+}
+.meter-fill { display: block; height: 100%; width: 0; background: var(--ok); transition: width 60ms linear; }
+
+.debug { border-top: 1px dashed var(--bord); padding-top: 12px; margin-bottom: 8px; font-size: 0.9rem; }
+.debug summary { cursor: pointer; margin-bottom: 10px; }
+.debug input[type="range"] { flex: 1; padding: 0; accent-color: var(--or); }
+.quality-value { width: 3.5em; text-align: right; font-family: ui-monospace, Consolas, monospace; }

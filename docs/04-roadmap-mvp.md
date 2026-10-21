@@ -31,13 +31,14 @@
 
 ## Jalon 2 · La radio ⭐ (cœur du jeu)
 
-- ☐ Capture du micro (`getUserMedia`) avec l'écran « Autoriser le micro »
-- ☐ Connexion WebRTC entre les deux joueurs (messages de *signaling* relayés par la `NightRoom`)
-- ☐ Push-to-Talk sur **[Espace]** : `ptt_request` → le serveur accorde → piste activée
-- ☐ Semi-duplex : si l'autre parle, mon appui donne un « bip occupé »
-- ☐ Chaîne DSP sur la voix reçue (lowpass, bruit, crépitements)
-- ☐ **Curseur de debug** « qualité du signal » 0 → 1, pour régler les sons à l'oreille
-- ☐ Sons de squelch (début et fin d'émission) et voyant « EN ÉMISSION »
+- ✅ Capture du micro (`getUserMedia`) au clic sur « 📻 Allumer la radio », avec des messages d'erreur clairs
+- ✅ Connexion WebRTC entre les deux joueurs (messages de *signaling* relayés par la `NightRoom`, le Capitaine initie)
+- ✅ Push-to-Talk sur **[Espace]** ou bouton : `ptt_request` → le serveur accorde → piste activée (30 s max)
+- ✅ Semi-duplex : si l'autre parle, mon appui donne un « bip occupé »
+- ✅ Chaîne DSP sur la voix reçue (passe-haut, passe-bas, saturation, bruit rose, crépitements), dans `client/src/radio/receiver.ts`
+- ✅ **Curseur de debug** « qualité du signal », synchronisé entre les deux joueurs
+- ✅ Sons de squelch (début et fin d'émission), voyant « EN ÉMISSION / RÉCEPTION », vumètre du micro
+- ☐ Test entre deux PC du réseau local + réglage des sons à l'oreille
 
 **C'est fini quand :** on se parle d'un PC à l'autre à tour de rôle, et le curseur fait passer la voix de claire à « radio lointaine », et ça sonne bien.
 
