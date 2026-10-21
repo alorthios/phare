@@ -28,7 +28,12 @@ function onJoined(room: NightRoom) {
   });
 }
 
-goHome();
+if (location.pathname.startsWith("/debug/levelgen")) {
+  // Outil de développement : feuilleter les archipels générés (chargé seulement sur cette page).
+  import("./debug/levelgenPage.ts").then((m) => m.showLevelgenPage());
+} else {
+  goHome();
+}
 
 // Petit test : le client arrive-t-il à joindre le serveur ?
 const status = document.querySelector<HTMLParagraphElement>("#server-status")!;

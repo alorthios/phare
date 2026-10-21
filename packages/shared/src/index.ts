@@ -6,7 +6,7 @@ export * from "./state.ts";
 export * from "./radio.ts";
 export * from "./rng.ts";
 export * from "./boat.ts";
-export * from "./testWorld.ts";
+export * from "./levelgen/index.ts";
 
 export const GAME_TITLE = "Phare & Constel";
 

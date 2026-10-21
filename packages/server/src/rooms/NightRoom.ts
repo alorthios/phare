@@ -1,7 +1,8 @@
 import { Room, type Client, type Delayed } from "@colyseus/core";
 import {
   Boat, CODE_LENGTH, CODE_LETTERS, MSG, NightState, Player, RADIO, THROTTLE_STOP,
-  clampQuality, cleanName, isRole, isValidHelm, stepBoat, type HelmInput, type RadioLinkMessage,
+  clampQuality, cleanName, generateLevel, isNavigable, isRole, isValidHelm, stepBoat,
+  type HelmInput, type Level, type RadioLinkMessage,
 } from "@phare/shared";
 
 /** Fréquence de la simulation : 20 pas par seconde. */
@@ -31,6 +32,9 @@ export class NightRoom extends Room<{ state: NightState }> {
   /** Dernier ordre reçu du Capitaine. */
   private helm: HelmInput = { rudder: 0, throttle: THROTTLE_STOP };
 
+  /** L'archipel de la nuit (non synchronisé : chaque client le régénère à partir du seed). */
+  private level!: Level;
+
   onCreate() {
     // Le code à 4 lettres sert directement d'identifiant de salle.
     this.roomId = generateCode();
@@ -39,13 +43,23 @@ export class NightRoom extends Room<{ state: NightState }> {
     this.state.signalQuality = 1;
     this.state.seed = Math.floor(Math.random() * 2 ** 31);
 
-    // Le bateau part du sud de la zone, cap au nord, machine stoppée.
+    // L'archipel de la nuit : le serveur et les deux clients le génèrent à partir du même seed.
+    const started = performance.now();
+    this.level = generateLevel(this.state.seed);
+    const level = this.level;
+    console.log(`  🗺️  Archipel généré en ${Math.round(performance.now() - started)} ms (seed ${level.seed}, ${level.attempts} essai(s))`);
+
+    // Le bateau part de l'entrée de la baie, cap au nord, machine stoppée.
     const boat = (this.state.boat = new Boat());
-    Object.assign(boat, { x: 0, z: 150, heading: 0, speed: 0, rudder: 0, throttle: THROTTLE_STOP });
+    Object.assign(boat, {
+      x: level.spawn.x, z: level.spawn.z, heading: level.spawn.heading,
+      speed: 0, rudder: 0, throttle: THROTTLE_STOP,
+    });
 
     // Boucle de simulation : le serveur fait autorité sur la position du bateau.
+    const navigable = (x: number, z: number) => isNavigable(level, x, z);
     this.setSimulationInterval((deltaMs) => {
-      stepBoat(boat, this.helm, Math.min(deltaMs, 200) / 1000);
+      stepBoat(boat, this.helm, Math.min(deltaMs, 200) / 1000, navigable);
     }, TICK_MS);
 
     // --- Navigation ----------------------------------------------------------

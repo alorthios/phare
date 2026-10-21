@@ -30,8 +30,9 @@ export const NightState = schema({
   floorHolder: t.string(),
   /** Qualité du signal radio, de RADIO.minQuality (brouillé) à 1 (clair). */
   signalQuality: t.number(),
-  /** Seed de la nuit : même nombre → même monde chez tout le monde. */
-  seed: t.number(),
+  /** Seed de la nuit : même nombre → même monde chez tout le monde.
+   *  Entier 32 bits EXACT (t.number() arrondirait un grand nombre → un autre monde !). */
+  seed: t.uint32(),
   boat: Boat,
 }, "NightState");
 export type NightState = SchemaType<typeof NightState>;

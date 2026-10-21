@@ -58,12 +58,16 @@
 
 ## Jalon 4 · L'archipel procédural
 
-- ☐ `rng.ts` + `carveMaze` + braiding + entrée et port (voir [doc 03](03-generation-procedurale.md))
-- ☐ Page `/debug/levelgen` : carte 2D, champ seed, bouton « Suivant »
-- ☐ Champ `waterness` + bruit, grille de collision, vérification de navigabilité
-- ☐ Mesh du terrain en 3D chez le Capitaine
-- ☐ Collisions côté serveur (le bateau bute sur les côtes)
-- ☐ **Carte du Gardien** : la vue 2D devient la carte sur sa table, avec la grille A–F / 1–6
+- ✅ `rng.ts` + `carveMaze` + braiding + entrée et port, dans `packages/shared/src/levelgen/` (voir [doc 03](03-generation-procedurale.md))
+- ✅ Page **`/debug/levelgen`** : carte 2D, champ seed, ← → pour feuilleter, chemin le plus court, zone navigable
+- ✅ Champ « eau » : tuiles lissées + **déformation du domaine** (couloirs sinueux) + bruit fin (rivages découpés)
+- ✅ Chenal d'entrée rectiligne, grille de collision (rayon du bateau), vérification de navigabilité. En cas d'échec, on recommence avec seed + 1 : environ 1,2 essai en moyenne, 0 départ bloqué sur 300 archipels testés
+- ✅ Terrain 3D chez le Capitaine (plages, herbe, collines low-poly), bouées d'entrée, ponton éclairé au port
+- ✅ Collisions côté serveur : le centre et la proue doivent rester en eau navigable, sinon léger rebond
+- ✅ **Carte du Gardien** avec la grille A–F / 1–6 et le secteur du bateau (vue de la table en 3D au jalon 5)
+- ✅ Seed transmis en entier 32 bits exact (`t.uint32()`) : avec `t.number()`, il était arrondi et le client générait un autre monde
+
+> ⚠️ `levelgen/` ne doit utiliser que de l'arithmétique simple : pas de `Math.random`, ni de `Math.sin`, `cos`, `exp` ou `hypot`. Leurs derniers chiffres peuvent varier d'un moteur JavaScript à l'autre, et les deux joueurs n'auraient alors plus le même archipel.
 
 **C'est fini quand :** chaque nouvelle partie donne un archipel différent, identique chez les deux joueurs, et on ne peut pas traverser la terre.
 

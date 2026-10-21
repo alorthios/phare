@@ -1,4 +1,4 @@
-import { ROLE_INFO, isRole } from "@phare/shared";
+import { ROLE_INFO, generateLevel, isRole } from "@phare/shared";
 import { startCaptainView } from "../captain/captainView.ts";
 import { startKeeperView } from "../keeper/keeperView.ts";
 import type { NightRoom } from "../net/connection.ts";
@@ -11,6 +11,8 @@ import { createRadioHud } from "./radioHud.ts";
  * avec par-dessus la radio et l'état de l'équipage. Renvoie une fonction de nettoyage.
  */
 export function showGameScreen(room: NightRoom, radio: Radio): () => void {
+  // Même seed que le serveur → exactement le même archipel, sans rien télécharger.
+  const level = generateLevel(room.state.seed);
   const me = room.state.players.get(room.sessionId);
   const role = me && isRole(me.role) ? me.role : "captain";
 
@@ -40,8 +42,8 @@ export function showGameScreen(room: NightRoom, radio: Radio): () => void {
   updateCrew();
 
   const stopView = role === "captain"
-    ? startCaptainView(room, root, overlay)
-    : startKeeperView(room, root, overlay);
+    ? startCaptainView(room, level, root, overlay)
+    : startKeeperView(room, level, root, overlay);
 
   return () => {
     stopView();

@@ -11,8 +11,10 @@ Ambiance : nocturne, poétique et cozy. Pas de mort, pas de monstre, seulement d
 
 ## État du projet
 
-⛵ **Jalon 3 terminé** : le Capitaine navigue en 3D (physique calculée par le serveur), le Gardien suit le bateau sur sa carte, et la radio fonctionne pendant la navigation.
-Prochaine étape : **Jalon 4 · L'archipel procédural** de la [feuille de route](docs/04-roadmap-mvp.md).
+🗺️ **Jalon 4 terminé** : chaque nuit génère un archipel-labyrinthe différent, identique chez les deux joueurs, avec des côtes infranchissables et une carte quadrillée A–F / 1–6 pour le Gardien.
+Prochaine étape : **Jalon 5 · Le phare et la brume** de la [feuille de route](docs/04-roadmap-mvp.md).
+
+Outil de développement : **https://localhost:5173/debug/levelgen** pour feuilleter les archipels générés (← → pour changer de seed).
 
 ## Commandes en jeu
 
@@ -50,12 +52,14 @@ Sans Docker, si Node.js 24 est installé : `npm install` puis `npm run dev`. `np
 ```
 packages/
 ├─ shared/   code commun client + serveur : rôles, état synchronisé (schema),
-│            physique du bateau (boat.ts), hasard reproductible (rng.ts)
+│            physique du bateau (boat.ts), hasard reproductible (rng.ts),
+│            génération de l'archipel (levelgen/)
 ├─ server/   serveur de jeu Colyseus : rooms/NightRoom.ts = une partie à 2
 └─ client/   le jeu dans le navigateur (Vite)
              net/ = connexion + interpolation, ui/ = écrans et HUD,
              radio/ = micro, WebRTC, Push-to-Talk, effets sonores,
-             captain/ = vue 3D du Capitaine (Three.js), keeper/ = carte du Gardien
+             captain/ = vue 3D du Capitaine (Three.js), keeper/ = carte du Gardien,
+             map/ = dessin de la carte, debug/ = page /debug/levelgen
 ```
 
 ## Documentation

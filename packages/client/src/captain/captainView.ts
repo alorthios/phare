@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { THROTTLE_STOP } from "@phare/shared";
+import { THROTTLE_STOP, type Level } from "@phare/shared";
 import { BoatInterpolator } from "../net/boatInterpolator.ts";
 import type { NightRoom } from "../net/connection.ts";
 import { h } from "../ui/dom.ts";
@@ -16,7 +16,7 @@ const MAX_PITCH = (75 * Math.PI) / 180;
  * `root` est le conteneur plein écran ; `overlay` contient la radio (ajoutée par l'appelant).
  * Renvoie une fonction de nettoyage.
  */
-export function startCaptainView(room: NightRoom, root: HTMLElement, overlay: HTMLElement): () => void {
+export function startCaptainView(room: NightRoom, level: Level, root: HTMLElement, overlay: HTMLElement): () => void {
   // --- Rendu 3D ---
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -27,7 +27,7 @@ export function startCaptainView(room: NightRoom, root: HTMLElement, overlay: HT
   const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 2000);
   camera.rotation.order = "YXZ";   // d'abord tourner la tête (lacet), puis lever/baisser (tangage)
 
-  const world = createWorld(scene, room.state.seed ?? 1);
+  const world = createWorld(scene, level);
   const boat = createBoat();
   boat.group.rotation.order = "YXZ";   // cap dans le monde, puis tangage et roulis dans le repère du bateau
   scene.add(boat.group);

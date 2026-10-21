@@ -13,8 +13,12 @@ export const BOAT = {
   speedInertia: 3,      // secondes pour atteindre ~63 % de la vitesse visée
   maxTurnRate: 0.35,    // rad/s, barre à fond et à bonne vitesse
   rudderRate: 1.6,      // vitesse de rotation de la barre (unités/s)
-  worldHalfSize: 200,   // zone de test : 400 m × 400 m (le labyrinthe arrive au jalon 4)
+  bowOffset: 4,         // la proue est à 4 m devant le centre : on teste aussi ce point
+  bounce: 0.3,          // part de la vitesse renvoyée en arrière quand on touche la côte
 } as const;
+
+/** Ce que la physique doit savoir du monde : où le bateau a le droit d'être. */
+export type NavigableFn = (x: number, z: number) => boolean;
 
 /** Positions du télégraphe de la machine, de « arrière » à « en avant toute ». */
 export const THROTTLE_LEVELS = [-1, 0, 1 / 3, 2 / 3, 1] as const;
@@ -48,8 +52,11 @@ export function isValidHelm(input: unknown): input is HelmInput {
     && Number.isInteger(throttle) && (throttle as number) >= 0 && (throttle as number) < THROTTLE_LEVELS.length;
 }
 
-/** Fait avancer le bateau de dt secondes. Modifie `boat` directement. */
-export function stepBoat(boat: BoatPhysicsState, helm: HelmInput, dt: number) {
+/**
+ * Fait avancer le bateau de dt secondes. Modifie `boat` directement.
+ * Renvoie true si le bateau a heurté la côte pendant ce pas.
+ */
+export function stepBoat(boat: BoatPhysicsState, helm: HelmInput, dt: number, isNavigable: NavigableFn): boolean {
   // 1. La barre tourne progressivement vers la position demandée.
   const rudderStep = BOAT.rudderRate * dt;
   boat.rudder += clamp(helm.rudder - boat.rudder, -rudderStep, rudderStep);
@@ -65,16 +72,21 @@ export function stepBoat(boat: BoatPhysicsState, helm: HelmInput, dt: number) {
   boat.heading = (((boat.heading + turnRate * dt) % TWO_PI) + TWO_PI) % TWO_PI;
 
   // 4. Déplacement selon le cap.
-  boat.x += Math.sin(boat.heading) * boat.speed * dt;
-  boat.z -= Math.cos(boat.heading) * boat.speed * dt;
+  const fx = Math.sin(boat.heading), fz = -Math.cos(boat.heading);
+  const nx = boat.x + fx * boat.speed * dt;
+  const nz = boat.z + fz * boat.speed * dt;
 
-  // 5. Bord de la zone de test : on s'arrête net (collisions réelles au jalon 4).
-  const limit = BOAT.worldHalfSize;
-  if (Math.abs(boat.x) > limit || Math.abs(boat.z) > limit) {
-    boat.x = clamp(boat.x, -limit, limit);
-    boat.z = clamp(boat.z, -limit, limit);
-    boat.speed = 0;
+  // 5. Collision : le centre ET la proue doivent rester en eau navigable.
+  //    Sinon le bateau reste sur place et rebondit doucement (pas de dégâts : jeu cozy).
+  const bowX = nx + fx * BOAT.bowOffset * Math.sign(boat.speed || 1);
+  const bowZ = nz + fz * BOAT.bowOffset * Math.sign(boat.speed || 1);
+  if (isNavigable(nx, nz) && isNavigable(bowX, bowZ)) {
+    boat.x = nx;
+    boat.z = nz;
+    return false;
   }
+  boat.speed *= -BOAT.bounce;
+  return true;
 }
 
 /** Cap en degrés (0-359) et point cardinal, pour l'affichage. */

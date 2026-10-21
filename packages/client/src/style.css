@@ -309,3 +309,11 @@ button.ptt.active {
   .hud-bottom-left { bottom: 8px; left: 8px; }
   .hud-bottom-right { bottom: 8px; right: 8px; }
 }
+
+/* --- Page de debug du générateur --- */
+.debug-panel { width: min(340px, calc(100vw - 32px)); }
+.debug-panel .row { gap: 6px; margin-bottom: 8px; }
+.debug-panel .row button { padding: 6px 10px; }
+.debug-panel input[type="number"] { padding: 6px 8px; font-family: ui-monospace, Consolas, monospace; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; margin: 4px 0; cursor: pointer; }
+.check input { width: auto; }
