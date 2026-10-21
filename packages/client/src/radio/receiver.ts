@@ -16,6 +16,8 @@ export class RadioReceiver {
   private readonly dry: GainNode;
   private readonly wet: GainNode;
   private readonly voice: GainNode;
+  /** Baisse brièvement la voix pendant un « krrrkrrkrrr » (le signal décroche). */
+  private readonly dropout: GainNode;
   private readonly noiseGain: GainNode;
   private readonly crackleBus: GainNode;
   private readonly noiseBuffer: AudioBuffer;
@@ -38,11 +40,12 @@ export class RadioReceiver {
     this.wet = new GainNode(ctx, { gain: 0 });
     const shaper = new WaveShaperNode(ctx, { curve: softClipCurve(6), oversample: "2x" });
     this.voice = new GainNode(ctx, { gain: 1 });
+    this.dropout = new GainNode(ctx, { gain: 1 });
 
     this.highpass.connect(this.lowpass);
     this.lowpass.connect(this.dry).connect(this.voice);
     this.lowpass.connect(shaper).connect(this.wet).connect(this.voice);
-    this.voice.connect(master);
+    this.voice.connect(this.dropout).connect(master);
 
     // Souffle permanent (très faible au repos, plus fort pendant une réception brouillée).
     this.noiseBuffer = createPinkNoiseBuffer(ctx);
@@ -107,18 +110,57 @@ export class RadioReceiver {
     this.noiseGain.gain.setTargetAtTime(noise, t, smooth);
   }
 
-  /** Crépitements : jusqu'à ~4 par seconde quand le signal est mauvais. */
+  /**
+   * Appelé toutes les 100 ms. Deux sortes de parasites :
+   *  - des crépitements isolés (« tic ») : jusqu'à ~4 par seconde quand le signal est mauvais ;
+   *  - des rafales « krrrkrrkrrr » : rares quand le signal est correct, fréquentes quand il est brouillé,
+   *    et très rarement au repos (le poste grésille un peu même quand personne ne parle).
+   */
   private maybeCrackle() {
-    if (!this.receiving || this.quality > 0.9) return;
-    const perSecond = (1 - this.quality) * 4.5;
-    if (Math.random() > perSecond / 10) return;
+    const bad = 1 - this.quality;   // 0 = signal parfait, 0.85 = très brouillé
 
-    const t = this.ctx.currentTime;
-    const duration = 0.01 + Math.random() * 0.03;
+    if (this.receiving && this.quality < 0.9) {
+      const clicksPerSecond = bad * 4.5;
+      if (Math.random() < clicksPerSecond / 10) {
+        this.click(this.ctx.currentTime, 0.01 + Math.random() * 0.03, 0.25 + Math.random() * 0.3, 1200);
+      }
+    }
+
+    const trainsPerSecond = this.receiving ? Math.pow(bad, 1.5) * 1.3 : 0.03;
+    if (Math.random() < trainsPerSecond / 10) this.crackleTrain(this.receiving ? 1 : 0.35);
+  }
+
+  /** « krrrkrrkrrr » : 2 ou 3 salves de micro-clics très rapprochés, au volume irrégulier. */
+  private crackleTrain(volume: number) {
+    let t = this.ctx.currentTime + 0.01;
+    const start = t;
+    const salvos = 1 + Math.floor(Math.random() * 3);
+
+    for (let s = 0; s < salvos; s++) {
+      const clicks = 4 + Math.floor(Math.random() * 9);
+      const pitch = 1500 + Math.random() * 2000;   // chaque « krr » a sa propre couleur
+      for (let i = 0; i < clicks; i++) {
+        t += 0.015 + Math.random() * 0.025;        // 15 à 40 ms entre deux clics
+        this.click(t, 0.006 + Math.random() * 0.006, volume * (0.08 + Math.random() * 0.3), pitch);
+      }
+      t += 0.05 + Math.random() * 0.08;            // petit silence entre deux « krr »
+    }
+
+    // Pendant la rafale, la voix décroche un peu, puis revient.
+    if (this.receiving) {
+      const g = this.dropout.gain;
+      g.cancelScheduledValues(start);
+      g.setTargetAtTime(0.35 + this.quality * 0.4, start, 0.02);
+      g.setTargetAtTime(1, t, 0.06);
+    }
+  }
+
+  /** Un clic bref : une miette de bruit filtrée, qui s'éteint très vite. */
+  private click(t: number, duration: number, gain: number, frequency: number) {
     const burst = new AudioBufferSourceNode(this.ctx, { buffer: this.noiseBuffer });
-    const hp = new BiquadFilterNode(this.ctx, { type: "highpass", frequency: 1200 });
+    const hp = new BiquadFilterNode(this.ctx, { type: "highpass", frequency });
     const env = new GainNode(this.ctx, { gain: 0 });
-    env.gain.setValueAtTime(0.25 + Math.random() * 0.3, t);
+    env.gain.setValueAtTime(gain, t);
     env.gain.exponentialRampToValueAtTime(0.001, t + duration);
     burst.connect(hp).connect(env).connect(this.crackleBus);
     burst.start(t, Math.random() * 2, duration);
