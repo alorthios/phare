@@ -2,6 +2,7 @@ import { schema, t, type SchemaType } from "@colyseus/schema";
 
 // État synchronisé automatiquement par Colyseus : le serveur le modifie,
 // les clients reçoivent les changements.
+// Les nombres sont transmis en précision réduite : 0.6 arrive en 0.6000000238 (sans importance ici).
 
 export const Player = schema({
   name: t.string(),
@@ -10,13 +11,27 @@ export const Player = schema({
 }, "Player");
 export type Player = SchemaType<typeof Player>;
 
+/** Le navire, simulé par le serveur (voir boat.ts pour le repère et les unités). */
+export const Boat = schema({
+  x: t.number(),
+  z: t.number(),
+  heading: t.number(),
+  speed: t.number(),
+  rudder: t.number(),
+  /** Ordre du télégraphe (index dans THROTTLE_LEVELS). */
+  throttle: t.number(),
+}, "Boat");
+export type Boat = SchemaType<typeof Boat>;
+
 export const NightState = schema({
   /** Joueurs de la salle, indexés par leur sessionId. */
   players: t.map(Player),
   /** sessionId du joueur qui a la parole, "" = canal libre. */
   floorHolder: t.string(),
-  /** Qualité du signal radio, de RADIO.minQuality (brouillé) à 1 (clair).
-   *  Transmis en précision réduite : 0.6 arrive en 0.6000000238 (sans importance pour le son). */
+  /** Qualité du signal radio, de RADIO.minQuality (brouillé) à 1 (clair). */
   signalQuality: t.number(),
+  /** Seed de la nuit : même nombre → même monde chez tout le monde. */
+  seed: t.number(),
+  boat: Boat,
 }, "NightState");
 export type NightState = SchemaType<typeof NightState>;

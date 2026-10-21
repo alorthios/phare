@@ -1,31 +1,26 @@
-import { RADIO, ROLE_INFO, isRole } from "@phare/shared";
+import { RADIO } from "@phare/shared";
 import type { NightRoom } from "../net/connection.ts";
 import type { LinkStatus, Radio } from "../radio/radio.ts";
-import { h, showScreen } from "./dom.ts";
+import { h } from "./dom.ts";
 
 const LINK_LABELS: Record<LinkStatus, string> = {
   waiting: "En attente de la radio du coéquipier…",
   connecting: "Liaison en cours…",
-  connected: "Liaison établie ✔",
-  lost: "Liaison perdue ✘ (vérifiez le réseau)",
+  connected: "Liaison établie",
+  lost: "Liaison perdue ✘",
 };
 
 /**
- * Le poste radio (jalon 2). Plus tard, il deviendra un objet dans la scène 3D
- * du Capitaine et du Gardien ; pour l'instant c'est un écran de test.
- * Renvoie une fonction de nettoyage.
+ * Petit poste radio affiché en surimpression pendant la partie (Capitaine et Gardien).
+ * Push-to-Talk : maintenir [Espace] (ou le bouton). Renvoie l'élément et une fonction de nettoyage.
  */
-export function showRadioScreen(room: NightRoom, radio: Radio): () => void {
-  const me = room.state.players.get(room.sessionId);
-  const myRole = me && isRole(me.role) ? ROLE_INFO[me.role].title : "";
-
-  const mateLine = h("p", { class: "hint" });
+export function createRadioHud(room: NightRoom, radio: Radio) {
   const led = h("span", { class: "led" });
   const ledLabel = h("span", { class: "led-label" });
-  const linkLine = h("p", { class: "link-status" });
+  const linkLine = h("span", { class: "hud-small" });
   const meterFill = h("span", { class: "meter-fill" });
 
-  const pttButton = h("button", { class: "ptt" }, "Maintenir pour parler");
+  const pttButton = h("button", { class: "ptt small" }, "Parler [Espace]");
   pttButton.addEventListener("pointerdown", (ev) => {
     pttButton.setPointerCapture(ev.pointerId);
     radio.press();
@@ -40,52 +35,41 @@ export function showRadioScreen(room: NightRoom, radio: Radio): () => void {
     "aria-label": "Qualité du signal (debug)",
   });
   slider.addEventListener("input", () => radio.setDebugQuality(Number(slider.value)));
+  // Les flèches du clavier servent à piloter : le curseur ne doit pas les capter.
+  slider.addEventListener("keydown", (ev) => ev.preventDefault());
 
-  showScreen(
-    h("div", { class: "card radio" },
-      h("p", { class: "code-label" }, `Poste radio · ${myRole}`),
-      mateLine,
-      h("div", { class: "led-panel" }, led, ledLabel),
-      linkLine,
-      pttButton,
-      h("p", { class: "hint" }, "Ou maintiens la touche [Espace]. Utilise un casque pour éviter l'écho."),
-      h("div", { class: "meter", title: "Niveau de ton micro" },
-        h("span", { class: "meter-label" }, "Micro"),
-        h("span", { class: "meter-track" }, meterFill),
-      ),
-      h("details", { class: "debug", open: true },
-        h("summary", {}, "Debug · qualité du signal"),
-        h("div", { class: "row" }, slider, qualityValue),
-        h("p", { class: "hint" },
-          "Simule la distance au faisceau du phare. Les deux joueurs entendent le même effet."),
-      ),
-      h("button", { class: "link", onclick: () => { room.leave(); } }, "Quitter la partie"),
+  const element = h("div", { class: "hud-panel radio-hud" },
+    h("div", { class: "led-row" }, led, ledLabel),
+    linkLine,
+    pttButton,
+    h("div", { class: "meter", title: "Niveau de ton micro" },
+      h("span", { class: "meter-label" }, "Micro"),
+      h("span", { class: "meter-track" }, meterFill),
+    ),
+    h("details", { class: "debug" },
+      h("summary", {}, "Debug · signal"),
+      h("div", { class: "row" }, slider, qualityValue),
     ),
   );
 
   const update = () => {
     const state = room.state;
-    const mate = [...state.players.entries()].find(([id]) => id !== room.sessionId)?.[1];
-    mateLine.textContent = mate
-      ? `En liaison avec ${mate.name}${mate.radioReady ? "" : " (radio éteinte)"}`
-      : "Ton coéquipier a quitté la partie.";
-
     let mode: "tx" | "rx" | "wait" | "idle" = "idle";
     let label = "Canal libre";
     if (radio.transmitting && radio.isPressed) {
       mode = "tx"; label = "EN ÉMISSION";
     } else if (radio.isPressed) {
-      mode = "wait"; label = radio.incomingFrom ? "Canal occupé" : "Ouverture du canal…";
+      mode = "wait"; label = radio.incomingFrom ? "Canal occupé" : "Ouverture…";
     } else if (radio.incomingFrom) {
-      const speaker = state.players.get(radio.incomingFrom)?.name ?? "Ton coéquipier";
-      mode = "rx"; label = `RÉCEPTION · ${speaker} parle`;
+      const speaker = state.players.get(radio.incomingFrom)?.name ?? "Coéquipier";
+      mode = "rx"; label = `${speaker} parle`;
     }
     led.className = `led ${mode}`;
     ledLabel.textContent = label;
     pttButton.classList.toggle("active", mode === "tx");
 
     linkLine.textContent = LINK_LABELS[radio.linkStatus];
-    linkLine.className = `link-status ${radio.linkStatus}`;
+    linkLine.className = `hud-small link-status ${radio.linkStatus}`;
 
     const q = state.signalQuality ?? 1;
     if (document.activeElement !== slider) slider.value = String(q);
@@ -94,7 +78,6 @@ export function showRadioScreen(room: NightRoom, radio: Radio): () => void {
   radio.onChange = update;
   update();
 
-  // Vumètre du micro, rafraîchi à chaque image.
   let frame = requestAnimationFrame(function loop() {
     meterFill.style.width = `${Math.round(radio.micLevel() * 100)}%`;
     frame = requestAnimationFrame(loop);
@@ -116,11 +99,13 @@ export function showRadioScreen(room: NightRoom, radio: Radio): () => void {
   window.addEventListener("keyup", onKeyUp);
   window.addEventListener("blur", onBlur);
 
-  return () => {
+  const dispose = () => {
     cancelAnimationFrame(frame);
     window.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("keyup", onKeyUp);
     window.removeEventListener("blur", onBlur);
     radio.onChange = undefined;
   };
+
+  return { element, dispose };
 }

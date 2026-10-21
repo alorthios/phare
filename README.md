@@ -11,8 +11,18 @@ Ambiance : nocturne, poétique et cozy. Pas de mort, pas de monstre, seulement d
 
 ## État du projet
 
-📻 **Jalon 2 en test** : la radio Push-to-Talk fonctionne (code écrit). Il reste à la tester à deux et à régler les sons à l'oreille.
-Voir la [feuille de route](docs/04-roadmap-mvp.md).
+⛵ **Jalon 3 terminé** : le Capitaine navigue en 3D (physique calculée par le serveur), le Gardien suit le bateau sur sa carte, et la radio fonctionne pendant la navigation.
+Prochaine étape : **Jalon 4 · L'archipel procédural** de la [feuille de route](docs/04-roadmap-mvp.md).
+
+## Commandes en jeu
+
+| Touche | Capitaine | Gardien |
+|---|---|---|
+| Clic sur la vue | prendre la barre (la souris regarde autour) | — |
+| Z / S (ou ↑ / ↓) | télégraphe de la machine + / − | — |
+| Q / D (ou ← / →) | barre à gauche / à droite (maintenir) | — |
+| Espace (maintenir) | parler à la radio | parler à la radio |
+| Échap | libérer la souris | — |
 
 ## Lancer le projet
 
@@ -39,10 +49,13 @@ Sans Docker, si Node.js 24 est installé : `npm install` puis `npm run dev`. `np
 
 ```
 packages/
-├─ shared/   code commun client + serveur : rôles, état synchronisé (schema), constantes
+├─ shared/   code commun client + serveur : rôles, état synchronisé (schema),
+│            physique du bateau (boat.ts), hasard reproductible (rng.ts)
 ├─ server/   serveur de jeu Colyseus : rooms/NightRoom.ts = une partie à 2
-└─ client/   le jeu dans le navigateur (Vite) : net/ = connexion, ui/ = écrans,
-             radio/ = micro, WebRTC, Push-to-Talk, effets sonores
+└─ client/   le jeu dans le navigateur (Vite)
+             net/ = connexion + interpolation, ui/ = écrans et HUD,
+             radio/ = micro, WebRTC, Push-to-Talk, effets sonores,
+             captain/ = vue 3D du Capitaine (Three.js), keeper/ = carte du Gardien
 ```
 
 ## Documentation

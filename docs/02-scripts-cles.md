@@ -16,7 +16,7 @@ Ce module est utilisé par le **serveur** (qualité radio) et par le **client** 
 export type LightFilter = "white" | "red" | "blue";
 
 export interface BeamState {
-  yaw: number;        // radians, 0 = +Z (nord)
+  yaw: number;        // radians, 0 = nord (-Z), sens horaire (même repère que boat.ts)
   pitch: number;      // radians, négatif = vers la mer
   filter: LightFilter;
 }
@@ -47,7 +47,7 @@ export function beamMask(p: Vec2, lighthouse: Vec2, beam: BeamState): number {
   const range = beamRange(beam.pitch);
   if (dist > range) return 0;
 
-  const angleToPoint = Math.atan2(dx, dz);
+  const angleToPoint = Math.atan2(dx, -dz);   // nord = -Z
   const delta = Math.abs(wrapAngle(angleToPoint - beam.yaw));
   const cone = 1 - smoothstep(BEAM.halfAngle, BEAM.halfAngle * 1.6, delta);
   const reach = 1 - smoothstep(range * 0.85, range, dist);
@@ -59,7 +59,7 @@ export function signalQuality(boat: Vec2, lighthouse: Vec2, beam: BeamState): nu
   if (beamMask(boat, lighthouse, beam) > 0.5) return 1;
 
   const dx = boat.x - lighthouse.x, dz = boat.z - lighthouse.z;
-  const delta = Math.abs(wrapAngle(Math.atan2(dx, dz) - beam.yaw));
+  const delta = Math.abs(wrapAngle(Math.atan2(dx, -dz) - beam.yaw));
   const t = smoothstep(BEAM.halfAngle, BEAM.halfAngle + BEAM.falloffAngle, delta);
   return lerp(1, BEAM.minQuality, t);
 }
@@ -114,7 +114,7 @@ export const fogUniforms = {
 };
 
 export function updateBeamUniforms(beam: { yaw: number; pitch: number }, range: number) {
-  fogUniforms.uBeamDir.value.set(Math.sin(beam.yaw), Math.cos(beam.yaw));
+  fogUniforms.uBeamDir.value.set(Math.sin(beam.yaw), -Math.cos(beam.yaw));   // nord = -Z
   fogUniforms.uBeamRange.value = range;
 }
 ```

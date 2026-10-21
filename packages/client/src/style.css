@@ -145,22 +145,112 @@ button.link { border: none; padding: 6px 0; color: var(--brume); text-decoration
 .status.ok { color: var(--ok); }
 .status.ko { color: var(--ko); }
 
-/* --- Poste radio --- */
-.radio .code-label { margin-bottom: 4px; }
-.radio .hint { margin-bottom: 12px; }
+/* --- Écran de jeu plein écran --- */
+body.in-game { padding: 0; overflow: hidden; }
+body.in-game #app { display: none; }
 
-.led-panel {
+#game {
+  position: fixed;
+  inset: 0;
+  background: var(--nuit);
+}
+#game canvas { display: block; position: absolute; inset: 0; }
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;   /* les clics passent au canvas, sauf sur les panneaux */
+  font-family: system-ui, sans-serif;
+  color: var(--texte);
+}
+.hud-panel, .lock-hint, .hud-panel * { pointer-events: auto; }
+
+.hud-top { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); }
+.hud-top-right { position: absolute; top: 16px; right: 16px; }
+.hud-bottom-left { position: absolute; bottom: 16px; left: 16px; max-width: min(320px, calc(100vw - 32px)); }
+.hud-bottom-right { position: absolute; bottom: 16px; right: 16px; width: min(260px, calc(100vw - 32px)); }
+
+.hud-panel {
+  background: rgba(11, 22, 48, 0.72);
+  border: 1px solid var(--bord);
+  border-radius: 12px;
+  padding: 12px 14px;
+  backdrop-filter: blur(4px);
+}
+.hud-title {
+  margin: 0 0 6px;
+  font-family: Georgia, serif;
+  color: var(--or);
+  font-size: 0.95rem;
+}
+.hud-panel .hud-title:not(:first-child) { margin-top: 10px; }
+.hud-small { display: block; font-size: 0.78rem; color: var(--brume); margin: 2px 0; }
+.hud-heading {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  color: var(--or);
+  background: rgba(11, 22, 48, 0.6);
+  border: 1px solid var(--bord);
+  border-radius: 999px;
+  padding: 6px 16px;
+  white-space: nowrap;
+}
+.hud-keys { font-size: 0.72rem; color: var(--brume); margin: 10px 0 0; }
+
+/* Télégraphe de la machine */
+.telegraph { list-style: none; margin: 0 0 6px; padding: 0; font-size: 0.8rem; }
+.telegraph li { padding: 2px 8px; border-radius: 6px; color: var(--brume); }
+.telegraph li.current { background: var(--or); color: var(--nuit); }
+
+/* Indicateur de barre */
+.rudder-track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(159, 176, 208, 0.15);
+}
+.rudder-center { position: absolute; left: 50%; top: -3px; width: 1px; height: 14px; background: var(--brume); }
+.rudder-marker {
+  position: absolute;
+  top: -3px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: var(--or);
+}
+
+/* Invitation à cliquer pour piloter */
+.lock-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  text-align: center;
+  padding: 18px 24px;
+  border-radius: 14px;
+  background: rgba(11, 22, 48, 0.75);
+  border: 1px solid var(--or-sombre);
+  cursor: pointer;
+  max-width: calc(100vw - 32px);
+}
+.lock-hint strong { color: var(--or); font-family: Georgia, serif; font-size: 1.2rem; font-weight: normal; }
+.lock-hint span { font-size: 0.8rem; color: var(--brume); }
+.lock-hint[hidden] { display: none; }
+
+/* --- Radio (panneau compact) --- */
+.led-row {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
-  padding: 12px;
-  border: 1px solid var(--bord);
-  border-radius: 10px;
-  background: rgba(11, 22, 48, 0.8);
   font-family: ui-monospace, Consolas, monospace;
-  letter-spacing: 0.08em;
-  color: var(--texte);
+  letter-spacing: 0.06em;
+  font-size: 0.85rem;
 }
 .led {
   width: 12px;
@@ -173,39 +263,49 @@ button.link { border: none; padding: 6px 0; color: var(--brume); text-decoration
 .led.rx { background: var(--ok); box-shadow: 0 0 12px var(--ok); }
 .led.wait { background: var(--or-sombre); }
 
-.link-status { text-align: center; font-size: 0.85rem; margin: 10px 0 16px; }
 .link-status.connected { color: var(--ok); }
 .link-status.lost { color: var(--ko); }
 
 button.ptt {
   display: block;
   width: 100%;
-  padding: 28px 16px;
-  font-size: 1.15rem;
-  border-radius: 14px;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 10px;
   border: 2px solid var(--or-sombre);
   color: var(--or);
   user-select: none;
   touch-action: none;
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
 }
 button.ptt.active {
   background: var(--or);
   color: var(--nuit);
-  box-shadow: 0 0 28px rgba(255, 217, 138, 0.45);
+  box-shadow: 0 0 20px rgba(255, 217, 138, 0.45);
 }
-.radio .ptt + .hint { text-align: center; margin-top: 8px; }
 
-.meter { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; margin: 8px 0 16px; }
+.meter { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; margin: 4px 0; }
 .meter-track {
   flex: 1;
-  height: 6px;
+  height: 5px;
   border-radius: 3px;
   background: rgba(159, 176, 208, 0.15);
   overflow: hidden;
 }
 .meter-fill { display: block; height: 100%; width: 0; background: var(--ok); transition: width 60ms linear; }
 
-.debug { border-top: 1px dashed var(--bord); padding-top: 12px; margin-bottom: 8px; font-size: 0.9rem; }
-.debug summary { cursor: pointer; margin-bottom: 10px; }
+.debug { border-top: 1px dashed var(--bord); padding-top: 8px; margin-top: 8px; font-size: 0.78rem; }
+.debug summary { cursor: pointer; }
+.debug .row { margin-top: 8px; align-items: center; }
 .debug input[type="range"] { flex: 1; padding: 0; accent-color: var(--or); }
 .quality-value { width: 3.5em; text-align: right; font-family: ui-monospace, Consolas, monospace; }
+
+.hud .link { font-size: 0.78rem; margin-top: 6px; }
+
+@media (max-width: 640px) {
+  .hud-top { top: 8px; }
+  .hud-top-right { top: 56px; right: 8px; }
+  .hud-bottom-left { bottom: 8px; left: 8px; }
+  .hud-bottom-right { bottom: 8px; right: 8px; }
+}

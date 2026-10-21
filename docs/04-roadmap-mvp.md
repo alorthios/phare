@@ -38,17 +38,21 @@
 - ✅ Chaîne DSP sur la voix reçue (passe-haut, passe-bas, saturation, bruit rose, crépitements), dans `client/src/radio/receiver.ts`
 - ✅ **Curseur de debug** « qualité du signal », synchronisé entre les deux joueurs
 - ✅ Sons de squelch (début et fin d'émission), voyant « EN ÉMISSION / RÉCEPTION », vumètre du micro
-- ☐ Test entre deux PC du réseau local + réglage des sons à l'oreille
+- ✅ Test à deux : liaison établie, voix et effets OK
 
 **C'est fini quand :** on se parle d'un PC à l'autre à tour de rôle, et le curseur fait passer la voix de claire à « radio lointaine », et ça sonne bien.
 
 ## Jalon 3 · Le bateau sur l'eau
 
-- ☐ Scène Three.js du Capitaine : un plan d'eau, un pont de bateau en boîtes simples, une caméra FPS (souris pour regarder, avec *pointer lock*)
-- ☐ Commandes : **Q/D** pour la barre, **Z/S** pour les gaz (clavier AZERTY, avec une option QWERTY)
-- ☐ Physique du bateau dans `shared/boatPhysics.ts`, exécutée **par le serveur** (20 ticks/s)
-- ☐ Le client interpole la position reçue
-- ☐ Vue du Gardien provisoire : un point qui bouge sur un canvas 2D
+- ✅ Scène Three.js du Capitaine : mer low-poly animée, ciel étoilé, pont et barre à roue, caméra FPS (souris + *pointer lock*)
+- ✅ Commandes : **Q/D** (maintenir) pour la barre, **Z/S** pour le télégraphe à 5 crans, ou les flèches. On lit `event.code`, donc ZQSD en AZERTY et WASD en QWERTY sans réglage
+- ✅ Physique du bateau (inertie, giration seulement en mouvement) dans `shared/src/boat.ts`, exécutée **par le serveur** (20 ticks/s)
+- ✅ Le client interpole la position reçue (100 ms de retard, `client/src/net/boatInterpolator.ts`)
+- ✅ Vue du Gardien provisoire : carte 2D avec le bateau, son cap et son sillage
+- ✅ Monde de test (bouées et rochers, sans collisions) généré à partir du seed, identique chez les deux joueurs
+- ✅ La radio reste disponible en surimpression pendant la navigation
+
+> Repère du monde : **+X = est, −Z = nord**. Le cap est mesuré dans le sens horaire depuis le nord (0 = N, π/2 = E). Sur la carte du Gardien, le nord est en haut.
 
 **C'est fini quand :** le Capitaine navigue, et le Gardien voit le point bouger en même temps.
 

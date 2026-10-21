@@ -3,8 +3,8 @@ import { GAME_TITLE } from "@phare/shared";
 import type { NightRoom } from "./net/connection.ts";
 import type { Radio } from "./radio/radio.ts";
 import { showHome } from "./ui/home.ts";
+import { showGameScreen } from "./ui/gameScreen.ts";
 import { showLobby } from "./ui/lobby.ts";
-import { showRadioScreen } from "./ui/radioScreen.ts";
 
 document.querySelector("#title")!.textContent = GAME_TITLE;
 
@@ -24,7 +24,7 @@ function onJoined(room: NightRoom) {
 
   showLobby(room, (r) => {
     radio = r;
-    cleanupScreen = showRadioScreen(room, r);
+    cleanupScreen = showGameScreen(room, r);
   });
 }
 

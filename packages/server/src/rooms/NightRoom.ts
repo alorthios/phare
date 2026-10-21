@@ -1,8 +1,11 @@
 import { Room, type Client, type Delayed } from "@colyseus/core";
 import {
-  CODE_LENGTH, CODE_LETTERS, MSG, NightState, Player, RADIO,
-  clampQuality, cleanName, isRole, type RadioLinkMessage,
+  Boat, CODE_LENGTH, CODE_LETTERS, MSG, NightState, Player, RADIO, THROTTLE_STOP,
+  clampQuality, cleanName, isRole, isValidHelm, stepBoat, type HelmInput, type RadioLinkMessage,
 } from "@phare/shared";
+
+/** Fréquence de la simulation : 20 pas par seconde. */
+const TICK_MS = 50;
 
 /** Codes des salles ouvertes, pour ne jamais donner deux fois le même. */
 const activeCodes = new Set<string>();
@@ -25,12 +28,35 @@ export class NightRoom extends Room<{ state: NightState }> {
   /** Minuteur qui coupe une émission trop longue. */
   private transmitTimeout?: Delayed;
 
+  /** Dernier ordre reçu du Capitaine. */
+  private helm: HelmInput = { rudder: 0, throttle: THROTTLE_STOP };
+
   onCreate() {
     // Le code à 4 lettres sert directement d'identifiant de salle.
     this.roomId = generateCode();
     activeCodes.add(this.roomId);
     this.state.floorHolder = "";
     this.state.signalQuality = 1;
+    this.state.seed = Math.floor(Math.random() * 2 ** 31);
+
+    // Le bateau part du sud de la zone, cap au nord, machine stoppée.
+    const boat = (this.state.boat = new Boat());
+    Object.assign(boat, { x: 0, z: 150, heading: 0, speed: 0, rudder: 0, throttle: THROTTLE_STOP });
+
+    // Boucle de simulation : le serveur fait autorité sur la position du bateau.
+    this.setSimulationInterval((deltaMs) => {
+      stepBoat(boat, this.helm, Math.min(deltaMs, 200) / 1000);
+    }, TICK_MS);
+
+    // --- Navigation ----------------------------------------------------------
+
+    // Seul le Capitaine tient la barre.
+    this.onMessage(MSG.helm, (client: Client, input: unknown) => {
+      if (this.state.players.get(client.sessionId)?.role !== "captain") return;
+      if (!isValidHelm(input)) return;
+      this.helm = { rudder: input.rudder, throttle: input.throttle };
+      boat.throttle = input.throttle;
+    });
 
     // --- Salle d'attente ---------------------------------------------------
 
@@ -107,6 +133,11 @@ export class NightRoom extends Room<{ state: NightState }> {
   onLeave(client: Client) {
     const player = this.state.players.get(client.sessionId);
     if (this.state.floorHolder === client.sessionId) this.releaseFloor();
+    if (player?.role === "captain") {
+      // Plus personne à la barre : on stoppe la machine et on remet la barre au centre.
+      this.helm = { rudder: 0, throttle: THROTTLE_STOP };
+      this.state.boat.throttle = THROTTLE_STOP;
+    }
     this.state.players.delete(client.sessionId);
     console.log(`  👋 ${player?.name ?? "?"} quitte ${this.roomId}`);
   }

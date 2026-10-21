@@ -4,6 +4,9 @@
 export * from "./roles.ts";
 export * from "./state.ts";
 export * from "./radio.ts";
+export * from "./rng.ts";
+export * from "./boat.ts";
+export * from "./testWorld.ts";
 
 export const GAME_TITLE = "Phare & Constel";
 
@@ -21,6 +24,7 @@ export const MSG = {
   pttRequest: "ptt_request",
   pttRelease: "ptt_release",
   debugSignal: "debug_signal",
+  helm: "helm",
   // serveur → client
   radioLink: "radio_link",
   pttDenied: "ptt_denied",
